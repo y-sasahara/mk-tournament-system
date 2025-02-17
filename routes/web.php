@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InstantGroupingController;
+use App\Http\Controllers\SnakeGroupingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::resource('instant-grouping', InstantGroupingController::class, ['only' => ['index', 'create', 'store', 'show']]);
+Route::resource('snake-grouping', SnakeGroupingController::class, ['only' => ['index', 'create', 'store', 'show']]);
