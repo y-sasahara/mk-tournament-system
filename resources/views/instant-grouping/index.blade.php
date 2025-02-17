@@ -35,11 +35,6 @@
                         <td class="px-1 py-2 border-y border-slate-300 text-center">
                             <button type="button" class="mx-1 px-2 py-1 rounded bg-sky-400 text-white hover:bg-sky-500" onclick="location.href='{{ url('instant-grouping/'. $instantGrouping->id) }}'">{{ __('表示') }}</button>
                         </td>
-                        <td class="px-1 py-2 border-y border-slate-300 text-center">
-                            @if ($instantGrouping->hasInstantGroupingScores())
-                            <button type="button" class="mx-1 px-2 py-1 rounded bg-green-500 text-white hover:bg-green-600" onclick="location.href='{{ url('instant-grouping/'. $instantGrouping->id . '/result') }}'">{{ __('得点集計フォーム') }}</button>
-                            @endif
-                        </td>
                     </tr>
                     @endforeach
                 </tbody>

@@ -13,12 +13,7 @@
             <p>作成者：{{ $instantGrouping->user->name }}</p>
             <p>対戦形式：{{ $instantGrouping->getTournamentTypeText() }}</p>
         </div>
-        @if ($instantGrouping->hasInstantGroupingScores())
-        <div class="my-2">
-            <button type="button" class="my-1 mx-1 px-2 py-1 rounded bg-green-500 text-white hover:bg-green-600" onclick="location.href='{{ url('instant-grouping/'. $instantGrouping->id . '/result') }}'">{{ __('得点集計フォーム') }}</button>
-        </div>
-        @endif
-        <div class="my-2">
+        <div class="my-3">
             <button type="button" class="my-1 mx-1 px-2 py-1 rounded bg-sky-400 text-white hover:bg-sky-500" onclick="copyToClipBoardAllGroup('result')">{{ __('全ての組み分け結果をコピー') }}</button>
         </div>
         <div id="copy-button" class="flex flex-wrap mb-4"></div>

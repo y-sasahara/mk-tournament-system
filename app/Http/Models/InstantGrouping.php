@@ -42,16 +42,6 @@ class InstantGrouping extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function instantGroupingScores()
-    {
-        return $this->hasMany('App\Models\InstantGroupingScore');
-    }
-
-    public function hasInstantGroupingScores()
-    {
-        return $this->instantGroupingScores()->exists();
-    }
-
     public function getTournamentTypeText()
     {
         switch ($this->type) {
