@@ -53,5 +53,8 @@
             <p class="text-red-600">※大会主催者様から「組み分けの時に入力ミスしました」などの個別連絡をいただいた場合に、管理者側で「組み分け失敗データ」として削除理由コメントを付ける場合があります。</p>
         </div>
         <p class="mt-3 text-sky-500 hover:text-blue-600"><a href="{{ url('grouping-manual') }}">組分けツールの使い方説明はこちら</a></p>
+        <p class="mt-2">ソースコードは以下のGitHubリポジトリで公開しています。</p>
+        <p class="text-sky-500 hover:text-blue-600"><a href="https://github.com/y-sasahara/mk-tournament-system">https://github.com/y-sasahara/mk-tournament-system</a></p>
+        <button type="button" class="mt-4 px-2 py-1 w-fit rounded bg-sky-400 text-white hover:bg-sky-500" onclick="location.href='{{ url('snake-grouping') }}'">{{ __('スネーク方式の組分けはこちら') }}</button>
     </div>
 </x-app-layout>
