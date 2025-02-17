@@ -16,6 +16,11 @@
         <div class="my-3">
             <button type="button" class="my-1 mx-1 px-2 py-1 rounded bg-sky-400 text-white hover:bg-sky-500" onclick="copyToClipBoardAllGroup('result')">{{ __('全ての組み分け結果をコピー') }}</button>
         </div>
+        <div class="text-xs text-gray-500 mb-2">
+            <p>＜Discordコピペ用ボタン＞</p>
+            <p>Discord上で正しく表示するために、一部の記号文字（ _ ~ ` : * | ）の前にバックスラッシュ（\）が挿入されます。</p>
+            <p>Discordでは一度に2000文字までしか書き込めないため、5組ごとにボタンを出力しています。</p>
+        </div>
         <div id="copy-button" class="flex flex-wrap mb-4"></div>
         <span id="result">{!! nl2br(e($instantGrouping->result)) !!}</span>
     </div>
