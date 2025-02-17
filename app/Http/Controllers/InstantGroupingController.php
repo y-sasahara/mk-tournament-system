@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreInstantGroupingRequest;
 use App\Models\InstantGrouping;
+use App\Models\Tournament;
+use App\Models\TournamentTeam;
 use Illuminate\Support\Facades\Auth;
 
 class InstantGroupingController extends Controller
@@ -398,21 +400,108 @@ class InstantGroupingController extends Controller
     /**
      * 組分けデータを作成する
      */
-    private function generateGroupingData(Int $groupCount, Array $hostPlayers, Array $normalPlayersChunk): string
+    private function generateGroupingData(Int $groupCount, Array $hostPlayers, Array $normalPlayersChunk, Int $type, String $name): string
     {
         $return = '';
         $groupNo = 1;
 
-        for ($i = 0; $i < $groupCount; $i++) {
-            $row = $groupNo . '組' . PHP_EOL;
-            $row .= $hostPlayers[$i] . PHP_EOL;
+        if ($type === self::FFA) {
+            for ($i = 0; $i < $groupCount; $i++) {
+                $row = $groupNo . '組' . PHP_EOL;
+                $row .= $hostPlayers[$i] . PHP_EOL;
 
-            foreach ($normalPlayersChunk[$i] as $player) {
-                $row .= $player . PHP_EOL;
+                $normalPlayersChunkAsc = [];
+                foreach ($normalPlayersChunk[$i] as $player) {
+                    if (preg_match('/進/u', $player)) {
+                        $registerNo = 1;
+                    } elseif (preg_match('/）【\d+】$/u', $player, $matches)) {
+                        $registerNo = preg_replace('/\D/u', '', $matches[0]) + 2;
+                    } else {
+                        $registerNo = 9999;
+                    }
+
+                    $normalPlayersChunkAsc[] = [
+                        'registerNo' => $registerNo,
+                        'playerText' => $player,
+                    ];
+                }
+
+                array_multisort(array_column($normalPlayersChunkAsc, 'registerNo'), SORT_ASC, $normalPlayersChunkAsc);
+
+                foreach ($normalPlayersChunkAsc as $value) {
+                    $row .= $value['playerText'] . PHP_EOL;
+                }
+
+                $groupNo++;
+                $return .= $row . '-' . PHP_EOL;
             }
+        } else {
+            if ($type !== self::TEAM) {
+                for ($i = 0; $i < $groupCount; $i++) {
+                    $row = $groupNo . '組' . PHP_EOL;
+                    $row .= $hostPlayers[$i] . PHP_EOL;
 
-            $groupNo++;
-            $return .= $row . '-' . PHP_EOL;
+                    foreach ($normalPlayersChunk[$i] as $player) {
+                        $row .= $player . PHP_EOL;
+                    }
+
+                    $groupNo++;
+                    $return .= $row . '-' . PHP_EOL;
+                }
+            } else {
+                $tournament = Tournament::where(['name' => $name])->first();
+                if ($tournament && $tournament->type === self::TEAM) {
+                    for ($i = 0; $i < $groupCount; $i++) {
+                        $row = $groupNo . '組' . PHP_EOL;
+                        $hostTeam = TournamentTeam::where(['tournament_id' => $tournament->id])->where(['team_tag' => $hostPlayers[$i]])->with(['tournamentTeamPlayer.user'])->first();
+                        if ($hostTeam) {
+                            $row .= $hostTeam->team_tag . PHP_EOL;
+                            foreach ($hostTeam->tournamentTeamPlayer as $tournamentTeamPlayer) {
+                                if ($tournamentTeamPlayer->can_host) {
+                                    $row .= $tournamentTeamPlayer->player_name;
+                                    $row .= $tournamentTeamPlayer->can_host ? '★進' : '';
+                                    $row .= '（' . $tournamentTeamPlayer->user->friend_code . '）';
+                                    $row .= PHP_EOL;
+                                }
+                            }
+                        } else {
+                            $row .= $hostPlayers[$i] . PHP_EOL;
+                        }
+
+                        foreach ($normalPlayersChunk[$i] as $player) {
+                            $normalTeam = TournamentTeam::where(['tournament_id' => $tournament->id])->where(['team_tag' => $player])->with(['tournamentTeamPlayer.user'])->first();
+                            if ($normalTeam) {
+                                $row .= $normalTeam->team_tag . PHP_EOL;
+                                foreach ($normalTeam->tournamentTeamPlayer as $tournamentTeamPlayer) {
+                                    if ($tournamentTeamPlayer->can_host) {
+                                        $row .= $tournamentTeamPlayer->player_name;
+                                        $row .= $tournamentTeamPlayer->can_host ? '★進' : '';
+                                        $row .= '（' . $tournamentTeamPlayer->user->friend_code . '）';
+                                        $row .= PHP_EOL;
+                                    }
+                                }
+                            } else {
+                                $row .= $player . PHP_EOL;
+                            }
+                        }
+
+                        $groupNo++;
+                        $return .= $row . '-' . PHP_EOL;
+                    }
+                } else {
+                    for ($i = 0; $i < $groupCount; $i++) {
+                        $row = $groupNo . '組' . PHP_EOL;
+                        $row .= $hostPlayers[$i] . PHP_EOL;
+
+                        foreach ($normalPlayersChunk[$i] as $player) {
+                            $row .= $player . PHP_EOL;
+                        }
+
+                        $groupNo++;
+                        $return .= $row . '-' . PHP_EOL;
+                    }
+                }
+            }
         }
 
         return $return;
