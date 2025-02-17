@@ -108,10 +108,10 @@ class InstantGroupingController extends Controller
             return back()->withInput()->with('error', $returnMessage);
         }
 
-        shuffle($hostPlayers);
-        shuffle($normalPlayers);
+        $hostPlayers = $this->shuffleArray($hostPlayers);
+        $normalPlayers = $this->shuffleArray($normalPlayers);
         $normalPlayersChunk = array_chunk($normalPlayers, $type - 1);
-        $groupingData = $this->generateGroupingData($groupCount, $hostPlayers, $normalPlayersChunk);
+        $groupingData = $this->generateGroupingData($groupCount, $hostPlayers, $normalPlayersChunk, $type, $validatedRequest['name']);
 
         $instantGrouping = new InstantGrouping();
 
@@ -177,10 +177,10 @@ class InstantGroupingController extends Controller
             ]);
         }
 
-        shuffle($hostPlayers);
-        shuffle($normalPlayers);
+        $hostPlayers = $this->shuffleArray($hostPlayers);
+        $normalPlayers = $this->shuffleArray($normalPlayers);
         $normalPlayersChunk = array_chunk($normalPlayers, $type - 1);
-        $groupingData = $this->generateGroupingData($groupCount, $hostPlayers, $normalPlayersChunk);
+        $groupingData = $this->generateGroupingData($groupCount, $hostPlayers, $normalPlayersChunk, $type, $validatedRequest['name']);
 
         return redirect('instant-grouping/create#check')->withInput()->with([
             "grouping-success" => __('組分けテストOK：正常に組分けできます。'),
@@ -191,6 +191,34 @@ class InstantGroupingController extends Controller
             'groups' => $groupCount,
             'grouping-result' => $groupingData,
         ]);
+    }
+
+    /**
+     * 入力された配列をシャッフルする
+     */
+    private function shuffleArray(Array $array): array
+    {
+        $shuffledArray = [];
+        $i = 0;
+        reset($array);
+
+        foreach ($array as $key => $value) {
+            if ($i == 0) {
+                $j = 0;
+            } else {
+                $j = mt_rand(0, $i);
+            }
+
+            if ($j == $i) {
+                $shuffledArray[] = $value;
+            } else {
+                $shuffledArray[] = $shuffledArray[$j];
+                $shuffledArray[$j] = $value;
+            }
+            ++$i;
+        }
+
+        return $shuffledArray;
     }
 
     /**
